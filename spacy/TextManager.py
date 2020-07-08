@@ -4,10 +4,11 @@ import regex as re
 class TextRunner:
 
     def __init__(self):
-        self.df = pd.read_csv('./training_data/collected_term_comments.csv')
+        self.df = pd.DataFrame()
         self.df_out = pd.DataFrame()
 
     def Cleaner(self):
+        self.df = pd.read_csv('./training_data/collected_term_comments.csv')
         cleaned = []
         for item in self.df['text']:
             text = item.replace("'", "")
@@ -18,10 +19,13 @@ class TextRunner:
         self.df_out['text'] = self.df['text']
         self.df_out.to_json('./training_data/cleaned_training_data.jsonl', orient='records', lines=True)
 
+    def Explorer(self):
+        self.df = pd.read_json('./CON_patters.jsonl', orient='records', lines=True)
+        print(self.df.head())
 
 
 
 
 
 if __name__ == '__main__':
-    TextRunner().Cleaner()
+    TextRunner().Explorer()
