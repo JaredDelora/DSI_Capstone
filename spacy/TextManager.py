@@ -41,8 +41,7 @@ class TextRunner:
         self.df = pd.read_json('./CON_patters.jsonl', orient='records', lines=True)
         print(self.df.head())
 
-    def _RedditExplorer(self, model):
-        file = './the_donald/bq-results-1.csv'
+    def _RedditExplorer(self, file):
         print(f'Reading and Cleaning file: {file}')
         df_temp = self._Cleaners(file, "body", "created_utc")
         dates = []
@@ -57,39 +56,40 @@ class TextRunner:
         return df_temp
 
     def EntCounter(self, model):
-        self.df = self._RedditExplorer(model)
+        in_file = './the_donald/bq-results-1.csv'
+        df = self._RedditExplorer(in_file)
+        print(df.columns)
 
-        model = model
-        print(self.df.head())
-        # print(f'Loading Model: {self.model}...')
-        # dates = []
-        # texts = []
-        #
+        df_temp = pd.DataFrame()
+        df_out = pd.DataFrame()
+        print(f'Loading Model: {model}...')
 
-        # self.df_out = pd.DataFrame()
-        # self.df_out['text'] = texts
-        # self.df_out['date'] = dates
-        #
-        # ent_list = []
-        #
-        # for tweet in self.df_out['text']:
-        #     df_temp = pd.DataFrame()
-        #     doc = nlp(tweet)
-        #
-        #     for item in doc.ents:
-        #         ent_list.append(str(item))
-        #
-        #     ent_set = set(ent_list)
-        #     ent_list = list(ent_set)
-        #
-        #     if len(ent_list) > 0:
-        #         df_temp['ents'] = ent_list
-        #         try:
-        #             print(df_temp['ents'].value_counts())
-        #             return None
-        #
-        #         except:
-        #             print('Error...')
+        nlp = spacy.load(model)
+        dates = []
+        texts = []
+
+        ent_list = []
+        curr_date = '2016-01-01'
+        day_string = ""
+        for tweet, date in zip(df['text'], df['date']):
+            if date == curr_date:
+                day_string = day_string + " " + tweet
+
+        doc = nlp(day_string)
+
+        for item in doc.ents:
+            ent_list.append(str(item))
+
+        # ent_set = set(ent_list)
+        # ent_list = list(ent_set)
+        collected_ents = []
+        if len(ent_list) > 0:
+            df_temp['ents'] = ent_list
+            X = df_temp['ents'].value_counts()
+            df_out[curr_date + '_ents'] = X.index
+            df_out[curr_date + '_count'] = list(X)
+            print(df_out.head(10))
+
 
     def TrumpTweets(self, model):
         print("Reading in Trump Tweets...")
@@ -134,10 +134,6 @@ class TextRunner:
                 except:
                     print('Error...')
 
-
-
-
-
     @staticmethod
     def SpacyTest(model):
 
@@ -161,9 +157,6 @@ class TextRunner:
             ent_count.append(curr_count)
             print(ent)
             print(curr_count)
-
-
-
 
 
 
