@@ -55,40 +55,69 @@ class TextRunner:
         df_temp['date'] = dates
         return df_temp
 
-    def EntCounter(self, model):
-        in_file = './the_donald/bq-results-1.csv'
+    def EntCounter(self):
+        month = 2
+        in_file = './the_donald/bq-results-' + str(month) + '.csv'
         df = self._RedditExplorer(in_file)
         print(df.columns)
 
-        df_temp = pd.DataFrame()
         df_out = pd.DataFrame()
-        print(f'Loading Model: {model}...')
+        print(f'Loading spaCy Model...')
 
-        nlp = spacy.load(model)
+        nlp = spacy.load('donald_model')
+        nlp.max_length = 2_000_000
         dates = []
         texts = []
 
-        ent_list = []
-        curr_date = '2016-01-01'
-        day_string = ""
-        for tweet, date in zip(df['text'], df['date']):
-            if date == curr_date:
-                day_string = day_string + " " + tweet
 
-        doc = nlp(day_string)
+        for i in range(1, 32):
+            df_temp = pd.DataFrame()
+            X_df = pd.DataFrame()
+            ent_list = []
+            #First we will create a string of our current date, we will loop through all the days in the month
+            if i < 10:
+                curr_date = '2016-02-0' + str(i)
+            else:
+                curr_date = '2016-02-' + str(i)
+            print(f'Currently processing date: {curr_date}')
 
-        for item in doc.ents:
-            ent_list.append(str(item))
+            # Now we will run through all the tweets of the day and build them into a single string
+            # Passing the whole day in at once to spaCy is much more efficient than doing it one tweet at a time.
+            print('Building string...')
+            day_string = ""
+            for tweet, date in zip(df['text'], df['date']):
+                if date == curr_date:
+                    day_string = day_string + " " + tweet
 
-        # ent_set = set(ent_list)
-        # ent_list = list(ent_set)
-        collected_ents = []
-        if len(ent_list) > 0:
-            df_temp['ents'] = ent_list
-            X = df_temp['ents'].value_counts()
-            df_out[curr_date + '_ents'] = X.index
-            df_out[curr_date + '_count'] = list(X)
-            print(df_out.head(10))
+            # Now we'll pass our string into our spaCy model
+            print('Passing string to spaCy...')
+            doc = nlp(day_string)
+
+            # Now we'l' convert each ent from a spaCy object to a string and stick them in a list
+            print("Building Ent List...")
+            for item in doc.ents:
+                ent_list.append(str(item))
+
+            # If there are ents present then we count them
+
+            if len(ent_list) > 0:
+                print("Creating Ent Counts...")
+                df_temp['ents'] = ent_list
+
+                # .value_counts() returns a pandas series object, not a dataframe
+                X = df_temp['ents'].value_counts()
+
+                # Populate a dataframe with the index (ent names) of the pandas series and the series values
+                X_df['ents'] = X.index
+                X_df['count'] = list(X)
+                # Just gonna keep the top 15 so our dataframe columns are consistant
+                X_df = X_df.head(15).copy()
+                df_out[curr_date + '_ents'] = X_df['ents']
+                df_out[curr_date + '_count'] = X_df['count']
+
+        out_string = '../data/ent_counts/ents_' + str(month) + '.csv'
+        df_out.to_csv(out_string)
+        print(df_out.head(15))
 
 
     def TrumpTweets(self, model):
@@ -162,5 +191,5 @@ class TextRunner:
 
 
 if __name__ == '__main__':
-    TextRunner().EntCounter('donald_model')
+    TextRunner().EntCounter()
     # TextRunner().SpacyTest('donald_model')
