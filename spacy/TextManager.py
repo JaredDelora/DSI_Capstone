@@ -1,6 +1,7 @@
 import pandas as pd
 import regex as re
 import spacy
+import datetime
 
 class TextRunner:
 
@@ -10,10 +11,10 @@ class TextRunner:
         self.model = None
 
     @staticmethod
-    def _Cleaner(file, column1, column2):
+    def _Cleaners(file, column1, column2):
         df = pd.read_csv(file)
         df_out = pd.DataFrame()
-        cleaned = []
+        cleaned_text = []
         dates = []
         curr = 1
         for text, date in zip(df[column1], df[column2]):
@@ -22,18 +23,17 @@ class TextRunner:
                 text = text.replace("'", "")
                 text = text.replace("\n", "")
                 text = text.replace("gopdebate", "")
-                cleaned.append(text)
+                cleaned_text.append(text)
                 dates.append(date)
             except:
                 print(f'Skipping line {curr}')
             curr += 1
 
-        df_out['text'] = cleaned
+        df_out['text'] = cleaned_text
         df_out['date'] = dates
         df_out['text'] = df_out['text'].str.lower().apply(lambda x: re.sub("[^a-z\s]", " ", x))
         df_out['text'].dropna(inplace=True)
         df_out.sort_values(by='date', axis=0, ascending=True, inplace=True)
-        df_out.index = df_out.reindex()
         return df_out
         # self.df_out.to_json('./training_data/cleaned_training_data.jsonl', orient='records', lines=True)
 
@@ -41,18 +41,55 @@ class TextRunner:
         self.df = pd.read_json('./CON_patters.jsonl', orient='records', lines=True)
         print(self.df.head())
 
-    def RedditExplorer(self, model):
+    def _RedditExplorer(self, model):
         file = './the_donald/bq-results-1.csv'
-        self.df = self._Cleaner(file, "body", "date")
-        self.model = model
-        print(f'Loading Model: {self.model}...')
-        nlp = spacy.load(self.model)
+        print(f'Reading and Cleaning file: {file}')
+        df_temp = self._Cleaners(file, "body", "created_utc")
+        dates = []
+        comments = []
+        print('Reformating Dates...')
+        for item in df_temp['date']:
+            utc_date = datetime.datetime.utcfromtimestamp(item)
+            date = str(utc_date).split()[0]
+            dates.append(date)
 
-        doc = nlp(text)
-        ents = []
-        for item in doc.ents:
-            ents.append(item)
-        print(ents)
+        df_temp['date'] = dates
+        return df_temp
+
+    def EntCounter(self, model):
+        self.df = self._RedditExplorer(model)
+
+        model = model
+        print(self.df.head())
+        # print(f'Loading Model: {self.model}...')
+        # dates = []
+        # texts = []
+        #
+
+        # self.df_out = pd.DataFrame()
+        # self.df_out['text'] = texts
+        # self.df_out['date'] = dates
+        #
+        # ent_list = []
+        #
+        # for tweet in self.df_out['text']:
+        #     df_temp = pd.DataFrame()
+        #     doc = nlp(tweet)
+        #
+        #     for item in doc.ents:
+        #         ent_list.append(str(item))
+        #
+        #     ent_set = set(ent_list)
+        #     ent_list = list(ent_set)
+        #
+        #     if len(ent_list) > 0:
+        #         df_temp['ents'] = ent_list
+        #         try:
+        #             print(df_temp['ents'].value_counts())
+        #             return None
+        #
+        #         except:
+        #             print('Error...')
 
     def TrumpTweets(self, model):
         print("Reading in Trump Tweets...")
@@ -132,5 +169,5 @@ class TextRunner:
 
 
 if __name__ == '__main__':
-    TextRunner().TrumpTweets('donald_model')
+    TextRunner().EntCounter('donald_model')
     # TextRunner().SpacyTest('donald_model')
