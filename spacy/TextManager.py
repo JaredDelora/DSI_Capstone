@@ -56,7 +56,7 @@ class TextRunner:
         return df_temp
 
     def EntCounter(self):
-        month = 2
+        month = 1
         in_file = './the_donald/bq-results-' + str(month) + '.csv'
         df = self._RedditExplorer(in_file)
         print(df.columns)
@@ -65,7 +65,7 @@ class TextRunner:
         print(f'Loading spaCy Model...')
 
         nlp = spacy.load('donald_model')
-        nlp.max_length = 2_000_000
+        nlp.max_length = 40_000_000
         dates = []
         texts = []
 
@@ -76,9 +76,9 @@ class TextRunner:
             ent_list = []
             #First we will create a string of our current date, we will loop through all the days in the month
             if i < 10:
-                curr_date = '2016-02-0' + str(i)
+                curr_date = '2016-01-0' + str(i)
             else:
-                curr_date = '2016-02-' + str(i)
+                curr_date = '2016-01-' + str(i)
             print(f'Currently processing date: {curr_date}')
 
             # Now we will run through all the tweets of the day and build them into a single string
