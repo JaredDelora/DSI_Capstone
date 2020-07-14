@@ -56,7 +56,7 @@ class TextRunner:
         return df_temp
 
     def EntCounter(self):
-        month = 7
+        month = 6
         in_file = './the_donald/bq-results-' + str(month) + '.csv'
         df = self._RedditExplorer(in_file)
         print(df.columns)
@@ -76,9 +76,9 @@ class TextRunner:
             ent_list = []
             #First we will create a string of our current date, we will loop through all the days in the month
             if i < 10:
-                curr_date = '2016-07-0' + str(i)
+                curr_date = '2016-06-0' + str(i)
             else:
-                curr_date = '2016-07-' + str(i)
+                curr_date = '2016-06-' + str(i)
             print(f'Currently processing date: {curr_date}')
 
 
@@ -169,11 +169,18 @@ class TextRunner:
 
         print(f'Loading Model: {model}...')
         nlp = spacy.load(model)
-        print(f'Processing Text...')
-        a = "george soros went to the seth rich supermarket where he saw black lives matter protesting the killing of seth rich over hillarys emails, clintons emails, and podestas emails."
-        b = "george smiled knowing that blm, pizzagate blue lives matter are just globalist plots to cover up clintons email and the human trafficing and pedo pizzagate activities taking place in benghazi. jeffery epstein."
-        c = a + b
-        doc = nlp(c)
+        print(f'The text we will be processing...')
+        print('------------------------------------')
+        a = "George Soros went to the Seth Rich supermarket where he saw Black Lives Matter "
+        print(a)
+        b = "protesting the killing of Seth Rich over Hillary's emails and Clinton's emails."
+        print(b)
+        c = "George smiled knowing that blm, Pizzagate, Blue Lives Matter are just Globalist plots to cover "
+        print(c)
+        d = "up Clinton's emails and the human trafficing and pedo pizzagate activities taking place in Benghazi."
+        print(d)
+        text = a + b + c + d
+        doc = nlp(text)
         ent_list = []
         ent_count = []
         # print(len(doc.ents))
@@ -181,12 +188,17 @@ class TextRunner:
             ent_list.append(str(item))
         # print(ent_list)
         ent_set = set(ent_list)
+        print(' ')
+        print('------------------')
+        print('Entities detected:')
+
+        print(ent_set)
         # print(len(ent_set))
-        for ent in ent_set:
-            curr_count = ent_list.count(ent)
-            ent_count.append(curr_count)
-            print(ent)
-            print(curr_count)
+        # for ent in ent_set:
+        #     curr_count = ent_list.count(ent)
+        #     ent_count.append(curr_count)
+        #     print(ent)
+        #     print(curr_count)
 
 
 
