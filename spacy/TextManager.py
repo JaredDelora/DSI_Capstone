@@ -56,7 +56,7 @@ class TextRunner:
         return df_temp
 
     def EntCounter(self):
-        month = 1
+        month = 7
         in_file = './the_donald/bq-results-' + str(month) + '.csv'
         df = self._RedditExplorer(in_file)
         print(df.columns)
@@ -65,7 +65,7 @@ class TextRunner:
         print(f'Loading spaCy Model...')
 
         nlp = spacy.load('donald_model')
-        nlp.max_length = 40_000_000
+        # nlp.max_length = 40_000_000
         dates = []
         texts = []
 
@@ -76,27 +76,28 @@ class TextRunner:
             ent_list = []
             #First we will create a string of our current date, we will loop through all the days in the month
             if i < 10:
-                curr_date = '2016-01-0' + str(i)
+                curr_date = '2016-07-0' + str(i)
             else:
-                curr_date = '2016-01-' + str(i)
+                curr_date = '2016-07-' + str(i)
             print(f'Currently processing date: {curr_date}')
+
 
             # Now we will run through all the tweets of the day and build them into a single string
             # Passing the whole day in at once to spaCy is much more efficient than doing it one tweet at a time.
-            print('Building string...')
-            day_string = ""
+            t2 = 0
             for tweet, date in zip(df['text'], df['date']):
                 if date == curr_date:
-                    day_string = day_string + " " + tweet
 
-            # Now we'll pass our string into our spaCy model
-            print('Passing string to spaCy...')
-            doc = nlp(day_string)
+                    # Now we'll pass our string into our spaCy model
+                    doc = nlp(tweet)
 
-            # Now we'l' convert each ent from a spaCy object to a string and stick them in a list
-            print("Building Ent List...")
-            for item in doc.ents:
-                ent_list.append(str(item))
+                    # Now we'l' convert each ent from a spaCy object to a string and stick them in a list
+                    for item in doc.ents:
+                        ent_list.append(str(item))
+
+                    if t2%10_000 == 0:
+                        print(t2)
+                t2 += 1
 
             # If there are ents present then we count them
 
