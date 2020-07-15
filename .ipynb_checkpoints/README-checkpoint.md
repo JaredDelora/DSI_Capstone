@@ -49,6 +49,7 @@ All of these twitter handles have been shown to have engaged in spreading the co
 ### The Data
 
 The data used for this analysis was taken from Reddit. Every comment made at r/the_donald for the 2016 was collected.
+The other subreddits listed above will also be collected and used in this model, but thus far only r/the_donald has been analyzed.
 
 ### Data Processing
 
@@ -67,7 +68,7 @@ The NLP training tool Podigy was used to traint the spaCy models. NER was perfor
 <img src="./images/results.png" alt="doggo" width="1000"/>
 
 ### Next Steps
-1. Complete Seth Rich Analysis Reddsit Analysis.
+1. Complete Seth Rich Analysis Reddit Analysis.
 2. Complete Reddit Analysis for the other identified conspiracies.
 3. Use the NER model to analyze the twitter accounts listed above.
 4. Exploratory Analysis and Correlation Findings
@@ -92,9 +93,6 @@ The NLP training tool Podigy was used to traint the spaCy models. NER was perfor
 │   │   ├── ents_10.csv
 │   │   ├── ents_11.csv
 │   │   ├── ents_12.csv
-│   │   ├── Kmeans_Result.ipynb
-│   │   ├── trials/
-│   │   └── w2v_trial.ipynb
 │   ├── trumptweets.csv
 └── spacy
     ├── TextManager.py (primary text cleaner / spaCy model runner)
