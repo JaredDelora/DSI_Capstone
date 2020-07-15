@@ -97,6 +97,7 @@ The NLP training tool Podigy was used to traint the spaCy models. NER was perfor
 └── spacy
     ├── TextManager.py (primary text cleaner / spaCy model runner)
     ├── EntExplorer.py
+    ├── spaCy_EDA.ipynb    
     ├── ent_dataframes
     │   ├── jan_seth_rich_ents
     │   ├── feb_seth_rich_ents
