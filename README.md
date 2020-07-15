@@ -6,7 +6,7 @@ Identify conspiracy trends in the political discussions occurring on Reddit betw
 **The fundamental question to be answered: Did the conspiracies that plagued the 2016 begin with chatter on social media? How much growth in the amount of chatter on Reddit was due to political figures and misinformation websites tweeting about them?**
 
 
-### Aproach
+### Approach
 **There are four conspiracy theories popular during the election that have been proven to be false. These are:**  
 - Seth Rich Murder
 - Pizzagate + John Podesta Pedophilia Accusations
